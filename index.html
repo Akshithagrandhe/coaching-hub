@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoachHub — Coaching, Without the Risk</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          emerald: {50:'#ecfdf5',100:'#d1fae5',200:'#a7f3d0',400:'#34d399',500:'#10b981',600:'#059669',700:'#047857',800:'#065f46',900:'#064e3b'},
+          navy: {950:'#080e1a',900:'#0f172a',800:'#1a2436',700:'#243044',600:'#334155'},
+          slate: {50:'#f8fafc',100:'#f1f5f9'},
+          amber: {400:'#fbbf24',500:'#f59e0b'},
+          danger: {50:'#fef2f2',500:'#ef4444',600:'#dc2626',700:'#b91c1c'}
+        },
+        fontFamily: {
+          display: ['Manrope','sans-serif'],
+          body: ['Inter','sans-serif'],
+          mono: ['JetBrains Mono','monospace']
+        },
+        boxShadow: {
+          soft: '0 2px 10px -2px rgba(15,23,42,0.08), 0 8px 24px -8px rgba(15,23,42,0.06)',
+          card: '0 1px 2px rgba(15,23,42,0.04), 0 12px 28px -12px rgba(15,23,42,0.12)',
+          glow: '0 0 0 4px rgba(16,185,129,0.12)'
+        },
+        keyframes: {
+          fadeUp: {'0%':{opacity:0,transform:'translateY(8px)'},'100%':{opacity:1,transform:'translateY(0)'}},
+          slideIn: {'0%':{transform:'translateX(100%)'},'100%':{transform:'translateX(0)'}},
+          popIn: {'0%':{opacity:0,transform:'scale(.96) translateY(6px)'},'100%':{opacity:1,transform:'scale(1) translateY(0)'}},
+          pulseSoft: {'0%,100%':{opacity:1},'50%':{opacity:.55}},
+          shieldPulse: {'0%,100%':{boxShadow:'0 0 0 0 rgba(16,185,129,0.35)'},'50%':{boxShadow:'0 0 0 8px rgba(16,185,129,0)'}},
+          marquee: {'0%':{transform:'translateX(0)'},'100%':{transform:'translateX(-50%)'}}
+        },
+        animation: {
+          fadeUp: 'fadeUp .5s ease both',
+          slideIn: 'slideIn .35s cubic-bezier(.16,1,.3,1) both',
+          popIn: 'popIn .25s cubic-bezier(.16,1,.3,1) both',
+          pulseSoft: 'pulseSoft 2.4s ease-in-out infinite',
+          shieldPulse: 'shieldPulse 2.6s ease-in-out infinite',
+          marquee: 'marquee 22s linear infinite'
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; }
+  .font-display { font-family: 'Manrope', sans-serif; }
+  ::selection { background: #a7f3d0; color:#064e3b; }
+
+  /* visible keyboard focus */
+  a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid #059669;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  .step-line { background: linear-gradient(90deg,#10b981 var(--p,0%), #e2e8f0 var(--p,0%)); }
+
+  .toggle-track { transition: background-color .25s ease; }
+  .toggle-thumb { transition: transform .25s cubic-bezier(.16,1,.3,1); }
+
+  .badge-glass {
+    backdrop-filter: blur(6px);
+    background: rgba(255,255,255,.92);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+
+  .scrollbar-hide::-webkit-scrollbar{ display:none; }
+  .scrollbar-hide{ -ms-overflow-style:none; scrollbar-width:none; }
+
+  .noise-bg {
+    background-image: radial-gradient(circle at 1px 1px, rgba(15,23,42,0.06) 1px, transparent 0);
+    background-size: 22px 22px;
+  }
+</style>
+</head>
+
+<body class="bg-slate-50 text-navy-900 antialiased">
+
+<!-- ============ SKIP LINK ============ -->
+<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] bg-navy-900 text-white px-4 py-2 rounded-lg">Skip to content</a>
+
+<!-- ============ TRUST NOTIFICATION BAR ============ -->
+<div class="bg-navy-900 text-emerald-50 text-[13px] font-medium overflow-hidden relative z-[60]">
+  <div class="max-w-7xl mx-auto px-4 py-2 flex items-center gap-2 justify-center text-center">
+    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+    <span class="tracking-tight">100% Escrow Protected&nbsp; • &nbsp;Verified Identities&nbsp; • &nbsp;Full Refund Guarantee</span>
+  </div>
+</div>
+
+<!-- ============ STICKY HEADER ============ -->
+<header class="sticky top-0 z-50 bg-white/85 backdrop-blur-md border-b border-slate-200/80">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <a href="#main" class="flex items-center gap-2 shrink-0 group">
+      <span class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-navy-900 group-hover:bg-emerald-700 transition-colors">
+        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i>
+      </span>
+      <span class="font-display font-800 text-lg tracking-tight text-navy-900">Coach<span class="text-emerald-600">Hub</span></span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-8 text-[14.5px] font-medium text-navy-600">
+      <a href="#coaches" class="hover:text-emerald-700 transition-colors">Find a coach</a>
+      <a href="#how-escrow-works" class="hover:text-emerald-700 transition-colors">How escrow works</a>
+      <a href="#safety" class="hover:text-emerald-700 transition-colors">Safety center</a>
+    </nav>
+
+    <div class="flex items-center gap-2.5">
+      <button onclick="openModal('signInModal')" class="hidden sm:inline-flex text-[14px] font-semibold text-navy-700 hover:text-emerald-700 px-3 py-2 rounded-lg transition-colors">Sign in</button>
+<button onclick="openModal('becomeCoachModal')" class="inline-flex items-center gap-1.5 text-[14px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg shadow-soft transition-colors">
+  <i data-lucide="user-plus" class="w-4 h-4"></i>
+  <span class="hidden sm:inline">Become a coach</span>
+  <span class="sm:hidden">Join</span>
+</button>
+
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="relative overflow-hidden border-b border-slate-200/70">
+  <div class="absolute inset-0 noise-bg opacity-40 pointer-events-none"></div>
+  <div class="absolute -top-24 -right-24 w-[420px] h-[420px] bg-emerald-200/40 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-14 sm:pt-24 sm:pb-20">
+    <div class="max-w-3xl">
+      <span class="inline-flex items-center gap-2 text-[12.5px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full animate-fadeUp">
+        <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+        Every dollar held in escrow until you approve it
+      </span>
+
+      <h1 class="font-display font-800 text-[2.5rem] leading-[1.08] sm:text-6xl sm:leading-[1.05] tracking-tight text-navy-900 mt-5 animate-fadeUp" style="animation-delay:.05s">
+        Coaching, without<br class="hidden sm:block"> the <span class="text-emerald-600">risk.</span>
+      </h1>
+
+      <p class="text-navy-600 text-[17px] sm:text-lg mt-5 max-w-xl leading-relaxed animate-fadeUp" style="animation-delay:.1s">
+        Every coach is background-checked, every payment sits in escrow, and every session comes with a full refund guarantee. You approve the payment — not before.
+      </p>
+
+      <div class="flex flex-wrap items-center gap-3 mt-8 animate-fadeUp" style="animation-delay:.15s">
+        <a href="#coaches" class="inline-flex items-center gap-2 bg-navy-900 hover:bg-navy-800 text-white font-semibold text-[15px] px-6 py-3.5 rounded-xl shadow-soft transition-colors">
+          Find a verified coach
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+        <button onclick="openScamModal()" class="inline-flex items-center gap-2 border border-slate-300 hover:border-danger-500 hover:text-danger-600 text-navy-700 font-semibold text-[15px] px-6 py-3.5 rounded-xl transition-colors bg-white">
+          <i data-lucide="flask-conical" class="w-4 h-4"></i>
+          See a scam attempt blocked
+        </button>
+      </div>
+    </div>
+
+    <!-- Live metrics -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-14 animate-fadeUp" style="animation-delay:.2s">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-card">
+        <div class="flex items-center gap-1.5 text-emerald-600 mb-1">
+          <span class="relative flex w-2 h-2">
+            <span class="animate-pulseSoft absolute inline-flex h-full w-full rounded-full bg-emerald-500"></span>
+          </span>
+          <span class="text-[11px] font-semibold uppercase tracking-wide">Live</span>
+        </div>
+        <p class="font-display font-800 text-2xl sm:text-3xl text-navy-900">$0</p>
+        <p class="text-[12.5px] text-navy-500 font-medium mt-0.5">Lost to scams, ever</p>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-card">
+        <p class="font-display font-800 text-2xl sm:text-3xl text-navy-900">100%</p>
+        <p class="text-[12.5px] text-navy-500 font-medium mt-0.5">Coaches background-checked</p>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-card">
+        <p class="font-display font-800 text-2xl sm:text-3xl text-navy-900">12,406</p>
+        <p class="text-[12.5px] text-navy-500 font-medium mt-0.5">Sessions escrow-protected</p>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-card">
+        <p class="font-display font-800 text-2xl sm:text-3xl text-navy-900">2 hrs</p>
+        <p class="text-[12.5px] text-navy-500 font-medium mt-0.5">Avg. refund resolution time</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW ESCROW WORKS (strip) ============ -->
+<section id="how-escrow-works" class="bg-navy-900 text-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div>
+        <p class="text-emerald-400 text-[12.5px] font-semibold uppercase tracking-wide mb-1">Why it's safe</p>
+        <h2 class="font-display font-700 text-2xl sm:text-[28px]">Your money moves in three guarded steps</h2>
+      </div>
+      <p class="text-navy-300 text-[14.5px] max-w-sm">The same protection shown in every booking modal below — nothing reaches the coach until you say the session went well.</p>
+    </div>
+    <div class="grid sm:grid-cols-3 gap-4">
+      <div class="bg-navy-800/80 border border-navy-600 rounded-2xl p-5">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-4"><i data-lucide="lock" class="w-5 h-5 text-emerald-400"></i></div>
+        <p class="font-semibold text-[15px]">1. Payment held in escrow</p>
+        <p class="text-navy-300 text-[13.5px] mt-1.5 leading-relaxed">You pay CoachHub, not the coach. Funds sit in a neutral, protected account.</p>
+      </div>
+      <div class="bg-navy-800/80 border border-navy-600 rounded-2xl p-5">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-4"><i data-lucide="video" class="w-5 h-5 text-emerald-400"></i></div>
+        <p class="font-semibold text-[15px]">2. Attend your session</p>
+        <p class="text-navy-300 text-[13.5px] mt-1.5 leading-relaxed">Meet your coach through the platform. Off-platform payment requests are never required.</p>
+      </div>
+      <div class="bg-navy-800/80 border border-navy-600 rounded-2xl p-5">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-4"><i data-lucide="badge-check" class="w-5 h-5 text-emerald-400"></i></div>
+        <p class="font-semibold text-[15px]">3. Approve the payment</p>
+        <p class="text-navy-300 text-[13.5px] mt-1.5 leading-relaxed">Only after you confirm the session happened does the coach get paid. Not happy? Full refund.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SEARCH & FILTER ============ -->
+<section id="coaches" class="max-w-7xl mx-auto px-4 sm:px-6 pt-14 sm:pt-16">
+  <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
+    <div>
+      <p class="text-emerald-700 text-[12.5px] font-semibold uppercase tracking-wide mb-1">Browse coaches</p>
+      <h2 class="font-display font-800 text-3xl text-navy-900">Every profile here has been checked</h2>
+      <p class="text-navy-500 text-[14.5px] mt-1.5">Filter by focus area or switch on "Verified only" to see identity- and credential-checked coaches.</p>
+    </div>
+  </div>
+
+  <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 shadow-card sticky top-[65px] z-30">
+    <div class="relative flex-1 min-w-[180px]">
+      <i data-lucide="search" class="w-4 h-4 text-navy-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+      <input id="searchInput" type="text" placeholder="Search coaches or specialties…"
+        class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-[14.5px] placeholder:text-navy-400 focus:bg-white transition-colors" oninput="renderCoaches()">
+    </div>
+
+    <div class="flex items-center gap-1.5 flex-wrap" id="filterBtns">
+      <!-- injected -->
+    </div>
+
+    <div class="flex items-center gap-2.5 sm:pl-4 sm:border-l border-slate-200 shrink-0">
+      <span class="text-[13.5px] font-semibold text-navy-700">Verified only</span>
+      <button id="verifiedToggle" onclick="toggleVerified()" aria-pressed="false" aria-label="Show verified coaches only"
+        class="toggle-track relative w-11 h-6 rounded-full bg-slate-300 shrink-0">
+        <span id="verifiedThumb" class="toggle-thumb absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow"></span>
+      </button>
+    </div>
+  </div>
+
+  <p id="resultsCount" class="text-[13px] text-navy-400 font-medium mt-4 mb-2"></p>
+
+  <!-- ============ COACH CARD GRID ============ -->
+  <div id="coachGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-6"></div>
+
+  <div id="emptyState" class="hidden flex-col items-center text-center py-20">
+    <div class="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-4"><i data-lucide="user-x" class="w-6 h-6 text-navy-400"></i></div>
+    <p class="font-semibold text-navy-700">No coaches match those filters</p>
+    <p class="text-[13.5px] text-navy-400 mt-1">Try a different category or turn off "Verified only".</p>
+  </div>
+</section>
+
+<!-- ============ SAFETY / SCAM SIMULATION BANNER ============ -->
+<section id="safety" class="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+  <div class="relative overflow-hidden bg-navy-900 rounded-3xl px-6 sm:px-12 py-12 sm:py-14 text-white">
+    <div class="absolute -bottom-20 -left-20 w-72 h-72 bg-danger-600/20 rounded-full blur-3xl"></div>
+    <div class="relative grid lg:grid-cols-[1.3fr,1fr] gap-8 items-center">
+      <div>
+        <span class="inline-flex items-center gap-2 text-[12px] font-semibold text-danger-300 bg-danger-600/15 border border-danger-500/30 px-3 py-1.5 rounded-full mb-4">
+          <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+          Interactive safety demo
+        </span>
+        <h2 class="font-display font-800 text-2xl sm:text-[28px] leading-tight">See what happens when a coach asks to move off-platform</h2>
+        <p class="text-navy-300 text-[14.5px] mt-3 max-w-lg leading-relaxed">The single most common coaching scam: a coach asks to be paid outside the platform, "just this once." Try the simulation to see how CoachHub intercepts it — before any money moves.</p>
+      </div>
+      <div class="flex lg:justify-end">
+        <button onclick="openScamModal()" class="inline-flex items-center gap-2 bg-white text-navy-900 hover:bg-slate-100 font-semibold text-[15px] px-6 py-3.5 rounded-xl shadow-soft transition-colors shrink-0">
+          <i data-lucide="flask-conical" class="w-4 h-4"></i>
+          Simulate off-platform request
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="border-t border-slate-200 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-navy-900"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i></span>
+      <span class="font-display font-800 text-[15px]">Coach<span class="text-emerald-600">Hub</span></span>
+    </div>
+    <p class="text-[13px] text-navy-400">Prototype for internship submission — not a live payment system. All data is illustrative.</p>
+  </div>
+</footer>
+
+<!-- ============ TOAST ============ -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] hidden">
+  <div class="flex items-center gap-2.5 bg-navy-900 text-white text-[14px] font-medium px-4 py-3 rounded-xl shadow-soft animate-popIn">
+    <i id="toastIcon" data-lucide="check-circle-2" class="w-4.5 h-4.5 text-emerald-400 shrink-0"></i>
+    <span id="toastMsg">Done</span>
+  </div>
+</div>
+
+<!-- ============ ESCROW CHECKOUT MODAL ============ -->
+<div id="escrowModal" class="fixed inset-0 z-[80] hidden">
+  <div class="absolute inset-0 bg-navy-950/60 backdrop-blur-sm" onclick="closeEscrowModal()"></div>
+  <div class="relative min-h-full flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="animate-popIn bg-white w-full sm:max-w-lg sm:rounded-3xl rounded-t-3xl shadow-card max-h-[92vh] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="escrowTitle">
+
+      <div class="sticky top-0 bg-white/95 backdrop-blur border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-emerald-700 font-semibold text-[13.5px]">
+          <i data-lucide="shield-check" class="w-4 h-4"></i> Escrow-protected booking
+        </div>
+        <button onclick="closeEscrowModal()" aria-label="Close" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-navy-400"><i data-lucide="x" class="w-4.5 h-4.5"></i></button>
+      </div>
+
+      <div class="px-6 pt-5 pb-2">
+        <div class="flex items-center gap-3.5">
+          <div id="modalAvatar" class="w-12 h-12 rounded-2xl flex items-center justify-center font-display font-700 text-white text-[15px]"></div>
+          <div>
+            <h3 id="escrowTitle" class="font-display font-700 text-[17px] text-navy-900">Book with <span id="modalCoachName"></span></h3>
+            <p id="modalCoachMeta" class="text-[13px] text-navy-500"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step tracker -->
+      <div class="px-6 pt-6">
+        <div class="flex items-center">
+          <div class="step-node flex flex-col items-center" data-step="1">
+            <div class="step-circle w-9 h-9 rounded-full flex items-center justify-center border-2 transition-colors"><i data-lucide="lock" class="w-4 h-4"></i></div>
+          </div>
+          <div class="flex-1 h-[3px] rounded step-line" id="line1" style="--p:0%"></div>
+          <div class="step-node flex flex-col items-center" data-step="2">
+            <div class="step-circle w-9 h-9 rounded-full flex items-center justify-center border-2 transition-colors"><i data-lucide="video" class="w-4 h-4"></i></div>
+          </div>
+          <div class="flex-1 h-[3px] rounded step-line" id="line2" style="--p:0%"></div>
+          <div class="step-node flex flex-col items-center" data-step="3">
+            <div class="step-circle w-9 h-9 rounded-full flex items-center justify-center border-2 transition-colors"><i data-lucide="badge-check" class="w-4 h-4"></i></div>
+          </div>
+        </div>
+        <div class="flex text-[11.5px] font-semibold text-navy-500 mt-2">
+          <span class="w-9 text-center -ml-1">Held</span>
+          <span class="flex-1"></span>
+          <span class="w-9 text-center">Session</span>
+          <span class="flex-1"></span>
+          <span class="w-9 text-center -mr-2.5">Approved</span>
+        </div>
+      </div>
+
+      <!-- Step content -->
+      <div class="px-6 pt-5">
+        <div id="stepPanel" class="bg-slate-50 border border-slate-200 rounded-2xl p-4"></div>
+      </div>
+
+      <div class="px-6 py-5">
+        <div class="flex items-start gap-2.5 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 mb-4">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 mt-0.5 shrink-0"></i>
+          <p class="text-[12.5px] text-emerald-800 leading-relaxed"><strong class="font-semibold">100% money-back guarantee.</strong> If the session doesn't happen or isn't as described, tell us within 48 hours and get a full refund — no questions about the coach's excuse required.</p>
+        </div>
+        <button id="escrowActionBtn" onclick="advanceEscrowStep()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[15px] py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="lock" class="w-4 h-4"></i> Confirm & hold payment in escrow
+        </button>
+        <p class="text-center text-[11.5px] text-navy-400 mt-3">This is a simulated flow for demo purposes — no real payment is processed.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SCAM WARNING MODAL ============ -->
+<div id="scamModal" class="fixed inset-0 z-[85] hidden">
+  <div class="absolute inset-0 bg-navy-950/70 backdrop-blur-sm" onclick="closeScamModal()"></div>
+  <div class="relative min-h-full flex items-center justify-center p-4">
+    <div class="animate-popIn bg-white w-full max-w-md rounded-3xl shadow-card overflow-hidden" role="alertdialog" aria-modal="true" aria-labelledby="scamTitle">
+      <div class="bg-danger-600 px-6 py-5 flex items-start gap-3">
+        <div class="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center shrink-0 mt-0.5">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <p id="scamTitle" class="text-white font-display font-700 text-[17px] leading-snug">Scam warning</p>
+          <p class="text-danger-50 text-[13.5px] mt-0.5">Off-platform payment requested</p>
+        </div>
+      </div>
+
+      <div class="px-6 pt-5 pb-2">
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 mb-4">
+          <p class="text-[13px] text-navy-500 mb-1 font-medium">Message from "coach"</p>
+          <p class="text-[14px] text-navy-700 italic leading-relaxed">"Let's skip the platform fee — just Venmo me directly and I'll send you the session link."</p>
+        </div>
+        <p class="text-[14px] text-navy-700 leading-relaxed">Your funds are only protected when you pay through CoachHub. Paying a coach directly removes escrow protection and the money-back guarantee — and it's the #1 pattern behind coaching scams.</p>
+      </div>
+
+      <div class="px-6 py-5 flex flex-col gap-2.5">
+        <button onclick="reportCoach()" class="w-full bg-danger-600 hover:bg-danger-700 text-white font-semibold text-[14.5px] py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="flag" class="w-4 h-4"></i> Report this coach
+        </button>
+        <button onclick="learnEscrow()" class="w-full border border-slate-300 hover:bg-slate-50 text-navy-700 font-semibold text-[14.5px] py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="book-open" class="w-4 h-4"></i> Learn about escrow safety
+        </button>
+        <button onclick="closeScamModal()" class="w-full text-navy-400 hover:text-navy-600 font-medium text-[13px] py-1.5">Dismiss</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FLOATING DESIGN RATIONALE BUTTON ============ -->
+<button onclick="openDrawer()" class="fixed bottom-6 right-6 z-[70] flex items-center gap-2 bg-navy-900 hover:bg-navy-800 text-white font-semibold text-[13.5px] pl-4 pr-5 py-3.5 rounded-full shadow-card animate-shieldPulse transition-colors">
+  <i data-lucide="clipboard-list" class="w-4 h-4 text-emerald-400"></i>
+  <span class="hidden sm:inline">View design strategy</span>
+  <span class="sm:hidden">Strategy</span>
+</button>
+
+<!-- ============ DESIGN RATIONALE DRAWER ============ -->
+<div id="drawerOverlay" class="fixed inset-0 z-[95] hidden">
+  <div class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" onclick="closeDrawer()"></div>
+  <aside class="animate-slideIn absolute right-0 top-0 h-full w-full sm:w-[460px] bg-white shadow-2xl overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between z-10">
+      <div>
+        <p class="text-[11.5px] font-semibold text-emerald-700 uppercase tracking-wide">For recruiters &amp; evaluators</p>
+        <h3 id="drawerTitle" class="font-display font-800 text-[18px] text-navy-900">Design strategy</h3>
+      </div>
+      <button onclick="closeDrawer()" aria-label="Close" class="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center text-navy-400"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+
+    <div class="px-6 py-6 space-y-7">
+
+      <div>
+        <p class="text-[13px] text-navy-500 leading-relaxed">This panel documents the reasoning behind CoachHub's UI decisions — treat it as a design walkthrough rather than a marketing page.</p>
+      </div>
+
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="brain" class="w-4 h-4 text-emerald-600"></i>
+          <h4 class="font-display font-700 text-[14.5px] text-navy-900">The core problem: trust, not features</h4>
+        </div>
+        <p class="text-[13.5px] text-navy-600 leading-relaxed">Coaching marketplaces fail on trust before they fail on matching. A user who fears losing money to a fake coach won't browse profiles — they'll leave. Every screen here is built to answer "is my money safe?" before it answers "is this coach good?"</p>
+      </div>
+
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="layers" class="w-4 h-4 text-emerald-600"></i>
+          <h4 class="font-display font-700 text-[14.5px] text-navy-900">Layered trust signals</h4>
+        </div>
+        <p class="text-[13.5px] text-navy-600 leading-relaxed">Trust cues appear at four altitudes: the notification bar (platform-wide promise), the hero metrics (proof, not claims), coach card badges (per-coach evidence), and the escrow modal (transaction-level guarantee). Repetition at decreasing scope mirrors how users actually verify claims — broad promise first, specific proof at the moment of decision.</p>
+      </div>
+
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="git-commit-horizontal" class="w-4 h-4 text-emerald-600"></i>
+          <h4 class="font-display font-700 text-[14.5px] text-navy-900">Why the escrow flow is a visible tracker</h4>
+        </div>
+        <p class="text-[13.5px] text-navy-600 leading-relaxed">Escrow is an abstract financial concept most users have never used outside eBay or freelance platforms. Rendering it as a three-node horizontal tracker — the same shape as a shipping tracker — borrows a mental model people already trust, instead of asking them to trust new legal language.</p>
+      </div>
+
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="shield-alert" class="w-4 h-4 text-danger-600"></i>
+          <h4 class="font-display font-700 text-[14.5px] text-navy-900">Why simulate the scam, not just warn about it</h4>
+        </div>
+        <p class="text-[13.5px] text-navy-600 leading-relaxed">Static warning copy ("beware of off-platform payment") is routinely ignored — banner blindness applies to safety messaging too. Letting a user trigger the exact scenario and watch the platform intercept it builds procedural memory: they now recognize the pattern in the wild, not just the policy in a footer link.</p>
+      </div>
+
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="palette" class="w-4 h-4 text-emerald-600"></i>
+          <h4 class="font-display font-700 text-[14.5px] text-navy-900">Color psychology</h4>
+        </div>
+        <p class="text-[13.5px] text-navy-600 leading-relaxed">Emerald is reserved for verified/safe states so it stays meaningful rather than decorative. Deep navy carries authority and institutional weight (used for the header, escrow strip, and floating CTA) — closer to a bank's palette than a typical coaching app's. Red is used exclusively for the scam simulation, so its appearance anywhere else would itself be a signal something is wrong.</p>
+      </div>
+
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="mouse-pointer-click" class="w-4 h-4 text-emerald-600"></i>
+          <h4 class="font-display font-700 text-[14.5px] text-navy-900">Edge cases handled</h4>
+        </div>
+        <ul class="text-[13.5px] text-navy-600 leading-relaxed space-y-1.5 list-disc pl-4">
+          <li>Empty filter state (no matches) has a dedicated message instead of a blank grid.</li>
+          <li>Unverified coaches are never hidden by default — the toggle is opt-in, so users aren't misled into thinking the whole marketplace is pre-filtered.</li>
+          <li>Modal and drawer both trap focus visually, close on overlay click and Escape, and restore scroll on close.</li>
+          <li>Reduced-motion preference disables non-essential animation.</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="accessibility" class="w-4 h-4 text-emerald-600"></i>
+          <h4 class="font-display font-700 text-[14.5px] text-navy-900">Accessibility notes</h4>
+        </div>
+        <p class="text-[13.5px] text-navy-600 leading-relaxed">All interactive controls have visible focus rings, icon-only buttons carry <code class="text-[12px] bg-slate-100 px-1 py-0.5 rounded font-mono">aria-label</code>s, the scam modal uses <code class="text-[12px] bg-slate-100 px-1 py-0.5 rounded font-mono">alertdialog</code> semantics, and color is never the sole carrier of meaning — badges pair icon + text.</p>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+        <p class="text-[12.5px] text-navy-500 leading-relaxed"><strong class="text-navy-700 font-semibold">Scope note:</strong> this is a static front-end prototype. Booking, escrow, and reporting actions are simulated client-side to demonstrate interaction design — no backend, payment processor, or identity verification service is connected.</p>
+      </div>
+    </div>
+  </aside>
+</div>
+<!-- MODAL: SIGN IN -->
+  <div id="signInModal" class="fixed inset-0 bg-navy-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative">
+      <button onclick="closeModal('signInModal')" class="absolute top-4 right-4 text-slate-400 hover:text-navy-900">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="log-in" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-xl font-bold text-navy-900">Welcome back</h3>
+        <p class="text-sm text-slate-500">Sign in to manage your sessions & escrow funds</p>
+      </div>
+
+      <form onsubmit="handleFormSubmit(event, 'signInModal')" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Email address</label>
+          <input type="email" required placeholder="you@example.com" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+          <input type="password" required placeholder="••••••••" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 hover:scale-[1.02] transition-all duration-300 text-white font-semibold rounded-lg text-sm">
+          Sign In
+        </button> 
+      </form>
+      <div class="mt-5 rounded-lg bg-slate-100 border border-slate-200 p-3 text-xs text-slate-600">
+    <p class="font-semibold mb-1">Demo Account</p>
+    <p>Email: demo@coachhub.com</p>
+    <p>Password: password123</p>
+</div>
+    </div>
+  </div>
+
+  <!-- MODAL: BECOME A COACH -->
+  <div id="becomeCoachModal" class="fixed inset-0 bg-navy-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative">
+      <button onclick="closeModal('becomeCoachModal')" class="absolute top-4 right-4 text-slate-400 hover:text-navy-900">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="mb-6">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold mb-2">
+          <i data-lucide="badge-check" class="w-4 h-4"></i> Strict Verification Protocol
+        </div>
+        <h3 class="text-xl font-bold text-navy-900">Apply as a Coach</h3>
+        <p class="text-sm text-slate-500">All applicants undergo ID check & credential verification.</p>
+      </div>
+
+      <form onsubmit="handleFormSubmit(event, 'becomeCoachModal')" class="space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+            <input type="text" required placeholder="John Doe" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Expertise Domain</label>
+            <select class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <option>UI/UX Design</option>
+              <option>Software Engineering</option>
+              <option>Career Coaching</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">LinkedIn / Portfolio Link</label>
+          <input type="url" required placeholder="https://linkedin.com/in/profile" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-sm transition-colors">
+          Submit Application for Review
+        </button>
+      </form>
+    </div>
+  </div>
+  <!-- BOOKING SUCCESS MODAL -->
+<div id="bookingSuccessModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl max-w-md w-full p-7 text-center shadow-2xl">
+
+        <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="badge-check" class="w-8 h-8 text-emerald-600"></i>
+        </div>
+
+        <h2 class="text-2xl font-bold text-navy-900 mb-2">
+            Booking Confirmed 🎉
+        </h2>
+
+        <p class="text-slate-600 mb-5">
+            Your payment is safely held in escrow until you approve the coaching session.
+        </p>
+
+        <div class="bg-slate-50 rounded-xl p-4 text-left space-y-2">
+
+            <p><b>Booking ID</b><br>#CH-20391</p>
+
+            <p><b>Status</b><br>Escrow Protected</p>
+
+            <p><b>Meeting Link</b><br>coachhub.demo/session</p>
+
+        </div>
+
+        <button
+        onclick="closeBookingSuccess()"
+        class="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3">
+
+            Continue
+
+        </button>
+
+    </div>
+
+</div>
+<script>
+/* ============================================================
+   DATA
+============================================================ */
+const COACHES = [
+  { id:1, name:'Maya Chen', category:'Career', title:'Ex-FAANG Career & Interview Coach', rate:65, rating:4.9, reviews:214, verified:true, idVerified:true, degreeVerified:true, initials:'MC', color:'from-emerald-500 to-emerald-700', bio:'8 yrs coaching PM & SWE candidates into top-tier offers.' },
+  { id:2, name:'Daniel Osei', category:'Fitness', title:'Certified Strength & Conditioning Coach', rate:40, rating:4.8, reviews:158, verified:true, idVerified:true, degreeVerified:true, initials:'DO', color:'from-navy-700 to-navy-900', bio:'NASM-CPT. Specializes in beginner strength programming.' },
+  { id:3, name:'Priya Ramanathan', category:'Academic', title:'Math & SAT Prep Specialist', rate:35, rating:5.0, reviews:96, verified:true, idVerified:true, degreeVerified:true, initials:'PR', color:'from-emerald-600 to-teal-700', bio:'MSc Applied Math. 96% of students raised SAT math 100+ pts.' },
+  { id:4, name:'Jordan Blake', category:'Career', title:'Resume & LinkedIn Strategist', rate:30, rating:4.6, reviews:41, verified:false, idVerified:true, degreeVerified:false, initials:'JB', color:'from-amber-500 to-amber-700', bio:'Former recruiter turned freelance resume consultant.' },
+  { id:5, name:'Sofia Marín', category:'Fitness', title:'Yoga & Mobility Coach', rate:28, rating:4.9, reviews:132, verified:true, idVerified:true, degreeVerified:true, initials:'SM', color:'from-emerald-500 to-emerald-700', bio:'RYT-500. Focus on injury recovery and mobility.' },
+  { id:6, name:'Tom Whitfield', category:'Academic', title:'College Essay & Admissions Coach', rate:55, rating:4.4, reviews:19, verified:false, idVerified:false, degreeVerified:false, initials:'TW', color:'from-slate-500 to-navy-700', bio:'Independent admissions consultant, 3rd year on CoachHub.' },
+];
+
+const CATEGORIES = ['All','Career','Academic','Fitness'];
+let activeCategory = 'All';
+let verifiedOnly = false;
+let escrowStep = 1;
+let activeCoach = null;
+
+/* ============================================================
+   INIT
+============================================================ */
+function init(){
+  renderFilterButtons();
+  renderCoaches();
+  lucide.createIcons();
+}
+
+function renderFilterButtons(){
+  const wrap = document.getElementById('filterBtns');
+  wrap.innerHTML = CATEGORIES.map(cat => `
+    <button onclick="setCategory('${cat}')" data-cat="${cat}"
+      class="filter-btn text-[13.5px] font-semibold px-3.5 py-2 rounded-lg transition-colors ${activeCategory===cat ? 'bg-navy-900 text-white' : 'bg-slate-100 text-navy-600 hover:bg-slate-200'}">
+      ${cat}
+    </button>`).join('');
+}
+
+function setCategory(cat){
+  activeCategory = cat;
+  renderFilterButtons();
+  lucide.createIcons();
+  renderCoaches();
+}
+
+function toggleVerified(){
+  verifiedOnly = !verifiedOnly;
+  const track = document.getElementById('verifiedToggle');
+  const thumb = document.getElementById('verifiedThumb');
+  track.setAttribute('aria-pressed', verifiedOnly);
+  if(verifiedOnly){
+    track.classList.remove('bg-slate-300'); track.classList.add('bg-emerald-600');
+    thumb.style.transform = 'translateX(20px)';
+  } else {
+    track.classList.add('bg-slate-300'); track.classList.remove('bg-emerald-600');
+    thumb.style.transform = 'translateX(0px)';
+  }
+  renderCoaches();
+}
+
+/* ============================================================
+   COACH GRID
+============================================================ */
+function renderCoaches(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const grid = document.getElementById('coachGrid');
+  const empty = document.getElementById('emptyState');
+  const count = document.getElementById('resultsCount');
+
+  const filtered = COACHES.filter(c => {
+    const matchCat = activeCategory==='All' || c.category===activeCategory;
+    const matchVerified = !verifiedOnly || c.verified;
+    const matchSearch = !q || c.name.toLowerCase().includes(q) || c.title.toLowerCase().includes(q) || c.category.toLowerCase().includes(q);
+    return matchCat && matchVerified && matchSearch;
+  });
+
+  count.textContent = `${filtered.length} coach${filtered.length!==1?'es':''} found`;
+
+  if(filtered.length===0){
+    grid.classList.add('hidden');
+    empty.classList.remove('hidden');
+    empty.classList.add('flex');
+    return;
+  }
+  grid.classList.remove('hidden');
+  empty.classList.add('hidden');
+  empty.classList.remove('flex');
+
+  grid.innerHTML = filtered.map((c,i) => `
+    <div class="group bg-white border border-slate-200 rounded-2xl p-5 shadow-card hover:shadow-lg hover:-translate-y-0.5 transition-all animate-fadeUp" style="animation-delay:${i*0.04}s">
+      <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br ${c.color} flex items-center justify-center font-display font-700 text-white text-[14px] shrink-0">${c.initials}</div>
+          <div>
+            <p class="font-display font-700 text-[15px] text-navy-900 leading-tight">${c.name}</p>
+            <p class="text-[12.5px] text-navy-500 mt-0.5">${c.title}</p>
+          </div>
+        </div>
+        ${c.verified ? `<span class="shrink-0 inline-flex items-center gap-1 text-[10.5px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-full"><i data-lucide="badge-check" class="w-3 h-3"></i>Verified</span>` : `<span class="shrink-0 inline-flex items-center gap-1 text-[10.5px] font-semibold text-navy-400 bg-slate-100 border border-slate-200 px-2 py-1 rounded-full"><i data-lucide="clock" class="w-3 h-3"></i>Pending</span>`}
+      </div>
+
+      <div class="flex flex-wrap gap-1.5 mb-4">
+        ${c.idVerified ? `<span class="inline-flex items-center gap-1 text-[11px] font-medium text-navy-600 bg-slate-100 px-2 py-1 rounded-md"><i data-lucide="fingerprint" class="w-3 h-3 text-emerald-600"></i>ID Verified</span>` : ''}
+        ${c.degreeVerified ? `<span class="inline-flex items-center gap-1 text-[11px] font-medium text-navy-600 bg-slate-100 px-2 py-1 rounded-md"><i data-lucide="graduation-cap" class="w-3 h-3 text-emerald-600"></i>Degree Verified</span>` : ''}
+        <span class="inline-flex items-center gap-1 text-[11px] font-medium text-navy-600 bg-slate-100 px-2 py-1 rounded-md"><i data-lucide="shield-check" class="w-3 h-3 text-emerald-600"></i>Escrow Protected</span>
+      </div>
+
+      <p class="text-[13px] text-navy-500 leading-relaxed mb-4 min-h-[38px]">${c.bio}</p>
+
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-0.5 text-amber-500">
+            ${renderStars(c.rating)}
+          </div>
+          <span class="text-[12.5px] font-semibold text-navy-700">${c.rating}</span>
+          <span class="text-[12px] text-navy-400">(${c.reviews})</span>
+        </div>
+        <p class="font-display font-800 text-[16px] text-navy-900">$${c.rate}<span class="text-[12px] font-medium text-navy-400">/hr</span></p>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="openEscrowModal(${c.id})" class="flex-1 inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[13.5px] py-2.5 rounded-xl transition-colors">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Book risk-free
+        </button>
+        <button onclick="openScamModal()" aria-label="Simulate an off-platform payment request from this coach" title="Simulate off-platform request" class="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl border border-slate-200 text-navy-400 hover:text-danger-600 hover:border-danger-300 transition-colors">
+          <i data-lucide="flask-conical" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  lucide.createIcons();
+}
+
+function renderStars(rating){
+  let html='';
+  for(let i=1;i<=5;i++){
+    if(rating>=i) html += `<i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></i>`;
+    else if(rating>=i-0.5) html += `<i data-lucide="star-half" class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></i>`;
+    else html += `<i data-lucide="star" class="w-3.5 h-3.5 text-slate-300"></i>`;
+  }
+  return html;
+}
+
+/* ============================================================
+   ESCROW MODAL
+============================================================ */
+function openEscrowModal(id){
+  activeCoach = COACHES.find(c=>c.id===id);
+  escrowStep = 1;
+  document.getElementById('modalCoachName').textContent = activeCoach.name;
+  document.getElementById('modalCoachMeta').textContent = `${activeCoach.title} · $${activeCoach.rate}/hr`;
+  const av = document.getElementById('modalAvatar');
+  av.className = `w-12 h-12 rounded-2xl flex items-center justify-center font-display font-700 text-white text-[15px] bg-gradient-to-br ${activeCoach.color}`;
+  av.textContent = activeCoach.initials;
+
+  document.getElementById('escrowModal').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  updateStepUI();
+  lucide.createIcons();
+}
+
+function closeEscrowModal(){
+  document.getElementById('escrowModal').classList.add('hidden');
+  document.body.style.overflow='';
+}
+
+function updateStepUI(){
+  document.querySelectorAll('.step-node').forEach(node=>{
+    const step = parseInt(node.dataset.step);
+    const circle = node.querySelector('.step-circle');
+    circle.classList.remove('bg-emerald-600','border-emerald-600','text-white','bg-white','border-slate-300','text-navy-300','border-emerald-300','text-emerald-600');
+    if(step < escrowStep){
+      circle.classList.add('bg-emerald-600','border-emerald-600','text-white');
+    } else if(step === escrowStep){
+      circle.classList.add('bg-white','border-emerald-600','text-emerald-600');
+    } else {
+      circle.classList.add('bg-white','border-slate-300','text-navy-300');
+    }
+  });
+  document.getElementById('line1').style.setProperty('--p', escrowStep>1 ? '100%':'0%');
+  document.getElementById('line2').style.setProperty('--p', escrowStep>2 ? '100%':'0%');
+
+  const panel = document.getElementById('stepPanel');
+  const btn = document.getElementById('escrowActionBtn');
+
+  if(escrowStep===1){
+    panel.innerHTML = `<p class="font-semibold text-[14px] text-navy-800 mb-1">Payment held in escrow</p><p class="text-[13px] text-navy-500 leading-relaxed">Your $${activeCoach.rate} session fee will be held safely until the session is complete — the coach cannot access it yet.</p>`;
+    btn.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i> Confirm & hold payment in escrow`;
+  } else if(escrowStep===2){
+    panel.innerHTML = `<p class="font-semibold text-[14px] text-navy-800 mb-1">Attend your session</p><p class="text-[13px] text-navy-500 leading-relaxed">Payment is secured. Meet ${activeCoach.name} through CoachHub's built-in video call — no off-platform links needed.</p>`;
+    btn.innerHTML = `<i data-lucide="video" class="w-4 h-4"></i> Simulate: mark session as attended`;
+  } else if(escrowStep===3){
+    panel.innerHTML = `<p class="font-semibold text-[14px] text-navy-800 mb-1">Approve payment</p><p class="text-[13px] text-navy-500 leading-relaxed">Session complete. Release the held funds to ${activeCoach.name}, or request a refund if something felt off.</p>`;
+    btn.innerHTML = `<i data-lucide="badge-check" class="w-4 h-4"></i> Approve payment & release funds`;
+  } else {
+    panel.innerHTML = `<div class="flex items-center gap-2 text-emerald-700"><i data-lucide="check-circle-2" class="w-5 h-5"></i><p class="font-semibold text-[14px]">Booking complete — funds released</p></div><p class="text-[13px] text-navy-500 leading-relaxed mt-1.5">Your session with ${activeCoach.name} is confirmed and paid. A receipt has been sent to your email.</p>`;
+    btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Done`;
+  }
+  lucide.createIcons();
+}
+
+function advanceEscrowStep(){
+  if(escrowStep < 4){
+    escrowStep++;
+    updateStepUI();
+    if(escrowStep===4) showToast('Payment released — booking complete!', 'check-circle-2');
+  } else {
+    closeEscrowModal();
+    openBookingSuccess();
+  }
+}
+
+/* ============================================================
+   SCAM MODAL
+============================================================ */
+function openScamModal(){
+  document.getElementById('scamModal').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  lucide.createIcons();
+}
+function closeScamModal(){
+  document.getElementById('scamModal').classList.add('hidden');
+  document.body.style.overflow='';
+}
+function reportCoach(){
+  closeScamModal();
+  showToast('Report submitted — our trust & safety team will review within 24h.', 'flag');
+}
+function learnEscrow(){
+  closeScamModal();
+  document.getElementById('how-escrow-works').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ============================================================
+   DRAWER
+============================================================ */
+function openDrawer(){
+  document.getElementById('drawerOverlay').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  lucide.createIcons();
+}
+function closeDrawer(){
+  document.getElementById('drawerOverlay').classList.add('hidden');
+  document.body.style.overflow='';
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+let toastTimer;
+function openModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.add('hidden');
+}
+
+function handleFormSubmit(event, modalId) {
+  event.preventDefault();
+  closeModal(modalId);
+  showToast('Action successful!', 'check-circle-2');
+}
+function showToast(msg, icon='check-circle-2'){
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  const iconEl = document.getElementById('toastIcon');
+  iconEl.setAttribute('data-lucide', icon);
+  toast.classList.remove('hidden');
+  lucide.createIcons();
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> toast.classList.add('hidden'), 3200);
+}
+
+/* ============================================================
+   GLOBAL: Escape key closes any open overlay
+============================================================ */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    closeEscrowModal();
+    closeScamModal();
+    closeDrawer();
+  }
+});
+function openLogin(){
+
+document.getElementById("loginModal").classList.remove("hidden");
+
+}
+
+function closeLogin(){
+
+document.getElementById("loginModal").classList.add("hidden");
+
+}
+
+function loginSuccess(){
+
+closeLogin();
+
+showToast("Logged in successfully!");
+
+}
+function openBookingSuccess(){
+
+    document.getElementById("bookingSuccessModal").classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+    lucide.createIcons();
+
+}
+
+function closeBookingSuccess(){
+
+    document.getElementById("bookingSuccessModal").classList.add("hidden");
+    document.body.style.overflow = "";
+
+}
+
+init();
+</script>
+
+      <input
+      type="email"
+      placeholder="Email"
+      class="w-full border rounded-lg p-3 mb-4">
+
+      <input
+      type="password"
+      placeholder="Password"
+      class="w-full border rounded-lg p-3 mb-3">
+
+      <div class="flex justify-between text-sm mb-5">
+          <label>
+              <input type="checkbox">
+              Remember me
+          </label>
+
+          <a href="#">Forgot?</a>
+      </div>
+
+      <button
+      onclick="loginSuccess()"
+      class="w-full bg-emerald-600 text-white rounded-lg py-3">
+      Login
+      </button>
+
+  </div>
+</div>
+</body>
+</html>
